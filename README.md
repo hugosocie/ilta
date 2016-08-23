@@ -1,4 +1,6 @@
-#Starter
+#Ilta
+
+Three js experiment
 
 ####Install
 
@@ -20,3 +22,10 @@ Bower is use for javascript dependencies
     $ gulp scripts
     $ gulp styles
     $ gulp watch
+
+####Bower dependencies
+
+    $ threejs
+    $ stats
+    $ vuejs
+    $ noisejs
