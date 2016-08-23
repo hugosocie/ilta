@@ -1,6 +1,6 @@
 #Ilta
 
-Three js experiment
+Three js experiment : https://hugosocie.github.io/ilta/
 
 ####Install
 
