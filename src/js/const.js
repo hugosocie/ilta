@@ -11,6 +11,10 @@ module.exports = function() {
         lights : [],
         meshes : [],
 
+        mesh : {
+            water : null
+        },
+
         chunk : 32,
         seed  : 0,
 
