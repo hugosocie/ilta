@@ -116,11 +116,6 @@ new Vue({
                 var geometry = this.merge( _.meshes[ key ] );
                 var material = this.material( parseInt( key ) );
 
-                if( key === '0x499ddc' ) {
-                    material.transparent = true;
-                    material.opacity = 0.7;
-                }
-
                 var mesh = new THREE.Mesh( geometry, material );
 
                 mesh.receiveShadow = true;
