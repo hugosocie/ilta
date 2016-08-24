@@ -162,11 +162,6 @@
 	                var geometry = this.merge( _.meshes[ key ] );
 	                var material = this.material( parseInt( key ) );
 
-	                if( key === '0x499ddc' ) {
-	                    material.transparent = true;
-	                    material.opacity = 0.7;
-	                }
-
 	                var mesh = new THREE.Mesh( geometry, material );
 
 	                mesh.receiveShadow = true;
@@ -202,6 +197,10 @@
 
 	        lights : [],
 	        meshes : [],
+
+	        mesh : {
+	            water : null
+	        },
 
 	        chunk : 32,
 	        seed  : 0,
@@ -1525,21 +1524,24 @@
 	        var size = _.chunk - 0.05,
 	            vertices = _.chunk * 2;
 
-	        var color = '0x499ddc';
+	        var material = this.material( 0x499ddc );
+
+	        material.transparent = true;
+	        material.opacity = 0.7;
 
 	        var geometry = new THREE.BoxGeometry(
 	            size, 1.2, size,
 	            vertices, 1, vertices
 	        );
 
-	        var mesh = new THREE.Mesh( geometry );
-
-	        mesh.position.x = -.5;
-	        mesh.position.y = -1.5;
-	        mesh.position.z = -.5;
+	        geometry.dynamic = true;
 
 	        for( var i = 0; i < geometry.vertices.length; i++ ){
+
 	            var v = geometry.vertices[ i ];
+
+	            v.side = v.y > 0 ? 'up' : 'down';
+	            v.dir = 'up';
 
 	            var h = ( ( _.noises.alt.simplex2(
 	                v.x / 20, 
@@ -1550,10 +1552,16 @@
 	            h = h + Math.random() / 6;
 
 	            v.y += h;
+
 	        }
 
-	        if( typeof _.meshes[ color ] === 'undefined' ) _.meshes[ color ] = [];
-	        _.meshes[ color ].push( mesh );
+	        _.mesh.water = new THREE.Mesh( geometry, material );
+
+	        _.mesh.water.position.x = -.5;
+	        _.mesh.water.position.y = -1.4;
+	        _.mesh.water.position.z = -.5;
+
+	        _.scene.add( _.mesh.water );
 
 	    }
 
@@ -1711,9 +1719,37 @@
 
 	    return function(){
 
-	        _.stats.begin();
+	        _.stats.begin();    
 
-	        _.renderer.render( _.scene, _.camera );         
+	        for( var i = 0; i < _.mesh.water.geometry.vertices.length; i++ ){
+	            var v = _.mesh.water.geometry.vertices[ i ];
+
+	            var h = 0.005 + ( ( Math.random() -0.5 ) / 100 );
+
+	            if( v.side === 'up' ) {
+
+	                if( v.dir === 'up' ) {
+	                    if( v.y < -0.5 ) {
+	                        v.y += h;
+	                    } else {
+	                        v.y -= h;
+	                        v.dir = 'down';
+	                    }
+	                } else {
+	                    if( v.y > -0.8 ) {
+	                        v.y -= h;
+	                    } else {
+	                        v.y += h;
+	                        v.dir = 'up';
+	                    }
+	                }
+
+	            }
+	        }
+
+	        _.mesh.water.geometry.verticesNeedUpdate = true;
+
+	        _.renderer.render( _.scene, _.camera );
 
 	        requestAnimationFrame( this.loop );
 	        _.stats.end();
